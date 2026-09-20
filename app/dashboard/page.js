@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "./LogoutButton";
+import ScoreManager from "./ScoreManager";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -18,6 +19,12 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .single();
 
+  // Scores: most recent pehle (RLS se sirf is user ke scores aate hain)
+  const { data: scores } = await supabase
+    .from("scores")
+    .select("id, score, played_on")
+    .order("played_on", { ascending: false });
+
   return (
     <main className="min-h-screen bg-slate-950 p-8 text-white">
       <div className="mx-auto max-w-2xl space-y-4">
@@ -33,6 +40,8 @@ export default async function DashboardPage() {
             {profile?.charities?.name ?? "Not selected"} ({profile?.charity_percent}%)
           </p>
         </div>
+
+        <ScoreManager userId={user.id} initialScores={scores ?? []} />
 
         <LogoutButton />
       </div>
