@@ -31,6 +31,7 @@ export default function ScoreManager({ userId, initialScores }) {
     const { data } = await supabase
       .from("scores")
       .select("id, score, played_on")
+      .eq("user_id", userId)
       .order("played_on", { ascending: false });
     setScores(data ?? []);
   }

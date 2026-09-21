@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getEffectiveStatus, hasAccess } from "@/lib/subscription";
@@ -38,6 +39,7 @@ export default async function DashboardPage({ searchParams }) {
   const status = getEffectiveStatus(subscription);
   const canUseFeatures = hasAccess(status);
 
+  // Scores: RLS ki wajah se sirf apne scores aate hain
   const { data: scores } = await supabase
     .from("scores")
     .select("id, score, played_on")
@@ -49,6 +51,16 @@ export default async function DashboardPage({ searchParams }) {
         <h1 className="text-3xl font-bold">
           Welcome, {profile?.full_name || user.email} 👋
         </h1>
+
+        {/* Sirf admin ko dikhega */}
+        {profile?.role === "admin" && (
+          <Link
+            href="/admin"
+            className="inline-block rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10"
+          >
+            Open admin panel →
+          </Link>
+        )}
 
         {banner && <p className={`text-sm ${banner.color}`}>{banner.text}</p>}
 
