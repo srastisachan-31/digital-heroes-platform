@@ -5,6 +5,7 @@ import { getEffectiveStatus, hasAccess } from "@/lib/subscription";
 import LogoutButton from "./LogoutButton";
 import ScoreManager from "./ScoreManager";
 import SubscriptionCard from "./SubscriptionCard";
+import WinningsCard from "./WinningsCard";
 
 const banners = {
   success: { text: "Payment successful! Your subscription is now active. 🎉", color: "text-emerald-400" },
@@ -44,6 +45,13 @@ export default async function DashboardPage({ searchParams }) {
     .from("scores")
     .select("id, score, played_on")
     .order("played_on", { ascending: false });
+
+  // Winnings: is user ke draw wins
+  const { data: winnings } = await supabase
+    .from("winners")
+    .select("id, user_id, match_type, prize_amount, verification_status, payment_status, proof_url")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
 
   return (
     <main className="min-h-screen bg-slate-950 p-8 text-white">
@@ -90,6 +98,8 @@ export default async function DashboardPage({ searchParams }) {
             </p>
           </section>
         )}
+
+        <WinningsCard winnings={winnings ?? []} />
 
         <LogoutButton />
       </div>
